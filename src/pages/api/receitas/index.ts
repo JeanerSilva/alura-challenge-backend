@@ -1,12 +1,15 @@
 import Receita from "../models/Receita";
 import dbConnect from "../config";
 import { NextApiRequest, NextApiResponse } from "next";
-import assert from "assert";
 
 dbConnect();
 
 function ehPost(method: String) {
   return method === "POST";
+}
+
+function ehGet(method: String) {
+  return method === "GET";
 }
 
 async function naoExisteMesmaReceitaNoMesmoMes(
@@ -28,7 +31,7 @@ async function naoExisteMesmaReceitaNoMesmoMes(
         descricao: 1,
       },
     },
-    {
+    { 
       $match: {
         year: data.getFullYear(),
         month: data.getMonth()+1,
@@ -72,6 +75,16 @@ export default async function handler(
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, error });
+    }
+  } else {
+    if (ehGet(method)) {
+      try {
+        const receitas = await Receita.find({});
+        res.status(200).json({ success: true, receitas });
+      } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, error });
+      }
     }
   }
 }

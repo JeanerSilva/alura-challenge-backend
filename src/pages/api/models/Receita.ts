@@ -11,6 +11,6 @@ const ReceitaSchema = new mongoose.Schema({
 });
 
 const Receita =
-  mongoose.models.Receita || mongoose.model("receita", ReceitaSchema);
+  mongoose.models.Receita || mongoose.model("Receita", ReceitaSchema);
 
 export default Receita;
