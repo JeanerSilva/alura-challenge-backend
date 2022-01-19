@@ -1,5 +1,5 @@
-import Receita from "../../../models/Receita";
-import dbConnect from "../../../services/db";
+import Receita from "../models/Receita";
+import dbConnect from "../config";
 
 dbConnect();
 

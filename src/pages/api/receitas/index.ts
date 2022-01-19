@@ -1,5 +1,4 @@
 import Receita from "../models/Receita";
-import Despesa from "../models/Despesa";
 import dbConnect from "../config";
 
 dbConnect();
