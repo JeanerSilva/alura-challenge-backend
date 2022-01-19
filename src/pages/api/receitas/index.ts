@@ -17,20 +17,19 @@ function obtemDatasLimite (data:Date){
   return {dataInicial, dataFinal}
 }
 
-async function verificaMesmaReceitaNoMesmoMes(res: NextApiResponse, descricao: String, data: Date):Promise<boolean> {
+async function naoExisteMesmaReceitaNoMesmoMes(res: NextApiResponse, descricao: String, data: Date):Promise<boolean> {
   const {dataInicial, dataFinal } = obtemDatasLimite(data)
   
   try {
     const receitas = await Receita.find({
+      descricao,
       data: {
         $gte:new Date(dataInicial),
         $lte:new Date(dataFinal),
     }
     });
-    const resultado = receitas.find(d => d.descricao === descricao)
-    const existeMesmaReceitaNoMesmoMes = resultado ? false : true
-    //res.status(200).json({ existeMesmaReceitaNoMesmoMes , resultado });
-    return existeMesmaReceitaNoMesmoMes
+    
+    return receitas.length > 0 ? false : true
 
   } catch (error) {
     console.log(error);
@@ -53,11 +52,10 @@ export default async function handler(
       if (!descricao && !valor && !data) {
         throw "Falta dados para a inserção da receita";
       } else {
-        const existeMesmaReceitaNoMesmoMes = await verificaMesmaReceitaNoMesmoMes(res, descricao, data)
-        if (existeMesmaReceitaNoMesmoMes) {
+
+        if (await naoExisteMesmaReceitaNoMesmoMes(res, descricao, data)) {
           const receita = await Receita.create({ descricao, valor, data });
           res.status(201).json({ success: true, data: receita });
-           res.status(201).json({ success: true, data: existeMesmaReceitaNoMesmoMes });
         } else {
           res
             .status(500)
@@ -66,7 +64,6 @@ export default async function handler(
               error: "Já existe a mesma receita neste mês",
             });
         }
-        console.log(`existeMesmaReceitaNoMesmoMes =  ${existeMesmaReceitaNoMesmoMes}`)
       }
     } catch (error) {
       console.log(error);
